@@ -1,9 +1,12 @@
 package com.BenjaminPark.domain;
 
+import com.BenjaminPark.exceptions.DuplicateTaskException;
+import com.BenjaminPark.exceptions.MissingTaskException;
 import jakarta.persistence.*;
 import org.springframework.security.crypto.bcrypt.BCrypt;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 
@@ -78,10 +81,48 @@ public class User {
     }
 
     /**
-     * Returns list of tasks of this user.
+     * Returns an unmodifiable list of tasks of this user.
      */
     public List<Task> getTasks() {
-        return tasks;
+        return Collections.unmodifiableList(tasks);
+    }
+
+    /**
+     * Adds task to this user's task list.
+     * @param task task to add to this user's task list.
+     */
+    public void addTask(Task task) throws DuplicateTaskException {
+        task.setOwner(this);
+        if (!tasks.contains(task)) {
+            tasks.add(task);
+        } else {
+            throw new DuplicateTaskException("Task already exists in this user's task list");
+        }
+    }
+
+    /**
+     * Removes task from this user's task list.
+     * @param task task to remove from this user's task list.
+     * @throws Exception No matching task found in this user's task list.
+     */
+    public void removeTask(Task task) throws MissingTaskException {
+        if (!tasks.remove(task)) {
+            throw new MissingTaskException("Task to be removed does not exist in this user's task list");
+        }
+    }
+
+    /**
+     * Updates task from this user's task list.
+     * @param task task to update, contains same taskid with updated details.
+     * @throws Exception No mathcing task found in this user's task list.
+     */
+    public void updateTask(Task task) throws MissingTaskException {
+        if (tasks.contains(task)) {
+            tasks.remove(task);
+            tasks.add(task);
+        } else {
+            throw new MissingTaskException("Task to be updated does not exist in this user's task list");
+        }
     }
 
     /**
@@ -104,5 +145,9 @@ public class User {
     @Override
     public int hashCode() {
         return userId != null ? userId.hashCode() : 0;
+    }
+
+    public String toString() {
+        return userId + " " + username;
     }
 }
