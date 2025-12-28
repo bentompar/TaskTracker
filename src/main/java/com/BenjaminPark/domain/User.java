@@ -1,6 +1,7 @@
 package com.BenjaminPark.domain;
 
 import com.BenjaminPark.exceptions.DuplicateTaskException;
+import com.BenjaminPark.exceptions.InvalidPasswordException;
 import com.BenjaminPark.exceptions.MissingTaskException;
 import jakarta.persistence.*;
 import org.springframework.security.crypto.bcrypt.BCrypt;
@@ -81,6 +82,19 @@ public class User {
     }
 
     /**
+     *
+     * @param oldPassword old password of this user.
+     * @param newPassword new password of this user.
+     * @throws Exception Exception when old password is invalid.
+     */
+    public void changeUserPassword(String oldPassword, String newPassword) throws InvalidPasswordException {
+        if (!checkUserPassword(oldPassword)) {
+            throw new InvalidPasswordException("Invalid Password");
+        }
+        this.userPassword = BCrypt.hashpw(newPassword, BCrypt.gensalt());
+    }
+
+    /**
      * Returns an unmodifiable list of tasks of this user.
      */
     public List<Task> getTasks() {
@@ -103,7 +117,7 @@ public class User {
     /**
      * Removes task from this user's task list.
      * @param task task to remove from this user's task list.
-     * @throws Exception No matching task found in this user's task list.
+     * @throws MissingTaskException No matching task found in this user's task list.
      */
     public void removeTask(Task task) throws MissingTaskException {
         if (!tasks.remove(task)) {
@@ -114,7 +128,7 @@ public class User {
     /**
      * Updates task from this user's task list.
      * @param task task to update, contains same taskid with updated details.
-     * @throws Exception No mathcing task found in this user's task list.
+     * @throws MissingTaskException No mathcing task found in this user's task list.
      */
     public void updateTask(Task task) throws MissingTaskException {
         if (tasks.contains(task)) {
