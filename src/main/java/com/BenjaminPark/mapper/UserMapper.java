@@ -16,7 +16,7 @@ public class UserMapper {
     }
 
     /**
-     * Returns updated User entity from updateUserDTO.
+     * Returns updated User entity from UpdateUserDTO.
      * @param user User to be updated.
      * @param updateUserDTO UpdateUserDTO to convert existing user entity.
      */

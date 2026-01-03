@@ -3,6 +3,7 @@ package com.BenjaminPark.domain;
 
 import jakarta.persistence.*;
 import java.time.LocalDate;
+import java.util.Optional;
 import java.util.UUID;
 
 /**
@@ -40,15 +41,6 @@ public class Task {
 
     protected Task() {}
 
-    public Task(User owner, String taskName, String taskDescription) {
-        this.owner = owner;
-        this.taskId = UUID.randomUUID();
-        this.taskName = taskName;
-        this.taskDescription = taskDescription;
-        this.taskStatus = TaskStatus.OPEN;
-        this.dueDate = null;
-    }
-
     public Task(User owner, String taskName, String taskDescription, LocalDate dueDate) {
         this.owner = owner;
         this.taskId = UUID.randomUUID();
@@ -56,6 +48,10 @@ public class Task {
         this.taskDescription = taskDescription;
         this.taskStatus = TaskStatus.OPEN;
         this.dueDate = dueDate;
+    }
+
+    public Task(User owner, String taskName, String taskDescription) {
+        this (owner, taskName, taskDescription, null);
     }
 
     /**
@@ -128,8 +124,8 @@ public class Task {
     /**
      * Returns the duedate of this task.
      */
-    public LocalDate getDueDate() {
-        return dueDate;
+    public Optional<LocalDate> getDueDate() {
+        return Optional.ofNullable(dueDate);
     }
 
     /**
