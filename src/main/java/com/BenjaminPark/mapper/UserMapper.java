@@ -4,7 +4,9 @@ import com.BenjaminPark.domain.User;
 import com.BenjaminPark.dto.CreateUserDTO;
 import com.BenjaminPark.dto.UpdateUserDTO;
 import com.BenjaminPark.dto.UserResponse;
+import org.springframework.stereotype.Component;
 
+@Component
 public class UserMapper {
 
     /**

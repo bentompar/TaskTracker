@@ -6,12 +6,14 @@ import com.BenjaminPark.exceptions.InvalidUserException;
 import com.BenjaminPark.exceptions.MissingTaskException;
 import com.BenjaminPark.repository.TaskRepository;
 import com.BenjaminPark.repository.UserRepository;
+import org.springframework.stereotype.Service;
 
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
+@Service
 public class TaskService {
     private final UserRepository userRepository;
     private final TaskRepository taskRepository;

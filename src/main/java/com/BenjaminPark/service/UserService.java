@@ -4,9 +4,11 @@ import com.BenjaminPark.domain.User;
 import com.BenjaminPark.exceptions.*;
 import com.BenjaminPark.repository.TaskRepository;
 import com.BenjaminPark.repository.UserRepository;
+import org.springframework.stereotype.Service;
 
 import java.util.UUID;
 
+@Service
 public class UserService {
 
     private final UserRepository userRepository;

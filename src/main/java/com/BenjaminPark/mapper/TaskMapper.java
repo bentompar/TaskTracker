@@ -6,12 +6,14 @@ import com.BenjaminPark.domain.User;
 import com.BenjaminPark.dto.CreateTaskDTO;
 import com.BenjaminPark.dto.TaskResponse;
 import com.BenjaminPark.dto.UpdateTaskDTO;
+import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
 
 
 import java.util.UUID;
 
+@Component
 public class TaskMapper {
 
 
