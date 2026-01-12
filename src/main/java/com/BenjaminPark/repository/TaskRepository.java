@@ -7,5 +7,5 @@ import java.util.List;
 import java.util.UUID;
 
 public interface TaskRepository extends JpaRepository<Task, UUID> {
-    List<Task> findByTaskOwner(UUID owner_id);
+    List<Task> findByOwner_userId(UUID owner_id);
 }

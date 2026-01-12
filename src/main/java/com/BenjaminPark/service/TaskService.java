@@ -58,7 +58,7 @@ public class TaskService {
     }
 
     public List<Task> getAllTasksByOwnerId(UUID userId) {
-        List<Task> tasks = Collections.unmodifiableList(taskRepository.findByTaskOwner(userId));
+        List<Task> tasks = Collections.unmodifiableList(taskRepository.findByOwner_userId(userId));
         if (tasks.isEmpty()) {
             return Collections.emptyList();
         } else {
