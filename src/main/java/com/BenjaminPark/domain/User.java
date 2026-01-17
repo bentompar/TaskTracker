@@ -81,6 +81,15 @@ public class User {
         return userPassword;
     }
 
+
+    /**
+     * Returns hashed password of this user.
+     * @return Hashed password of this user.
+     */
+    public String getUserPasswordHashed() {
+        return userPassword;
+    }
+
     /**
      *
      * @param oldPassword old password of this user.
