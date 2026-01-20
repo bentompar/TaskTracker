@@ -1,39 +1,41 @@
 package com.BenjaminPark.service;
 
 import com.BenjaminPark.domain.User;
+import com.BenjaminPark.dto.CreateUserDTO;
+import com.BenjaminPark.dto.UpdateUserDTO;
 import com.BenjaminPark.exceptions.*;
 import com.BenjaminPark.repository.TaskRepository;
 import com.BenjaminPark.repository.UserRepository;
+import jakarta.transaction.Transactional;
+import org.springframework.security.crypto.bcrypt.BCrypt;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.UUID;
 
 @Service
+@Transactional
 public class UserService {
 
     private final UserRepository userRepository;
-    private final TaskRepository taskRepository;
+    private final PasswordEncoder passwordEncoder;
 
-    public UserService(UserRepository userRepository, TaskRepository taskRepository) {
+    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
-        this.taskRepository = taskRepository;
+        this.passwordEncoder = passwordEncoder;
     }
 
 
     /**
      * Adds user to database.
-     * @param user User added to database.
+     * @param createUserDTO The dto containing the data of the user to be created.
      * @return User added to database.
      * @throws RuntimeException throws DuplicateUserIdException or DuplicateUsernameException
      */
 
-    public User createUser(User user) throws RuntimeException {
-        if (userRepository.existsById(user.getUserId())) {
-            throw new DuplicateUserIdException("UserId already exists.");
-        }
-        if (userRepository.existsByUsername(user.getUsername())) {
-            throw new DuplicateUsernameException("Username already exists.");
-        }
+    public User createUser(CreateUserDTO createUserDTO) throws RuntimeException {
+        String passwordHash = passwordEncoder.encode(createUserDTO.getPassword());
+        User user = new User(createUserDTO.getUsername(), passwordHash);
         userRepository.save(user);
         return user;
     }
@@ -41,16 +43,18 @@ public class UserService {
     /**
      * Updates existing user from database.
      * @param userId userId of user updated.
-     * @param updatedUser user containing updated user details.
-     * @param oldPassword old user password.
-     * @param newPassword new user password.
+     * @param updateUserDTO the dto containing the updated user data.
      * @return updated user.
      * @throws MissingUserIdException
      */
-    public User updateUser(UUID userId, User updatedUser, String oldPassword, String newPassword) throws MissingUserIdException {
+    public User updateUser(UUID userId, UpdateUserDTO updateUserDTO) throws MissingUserIdException {
         User oldUser = userRepository.findById(userId).orElseThrow(() -> new MissingUserIdException("UserId Not Found."));
-        oldUser.setUsername(updatedUser.getUsername());
-        oldUser.changeUserPassword(oldPassword, newPassword);
+        if (updateUserDTO.getUsername() != null) {
+            oldUser.setUsername(updateUserDTO.getUsername());
+        }
+        if (updateUserDTO.getPassword() != null) {
+            oldUser.replacePasswordHash(passwordEncoder.encode(updateUserDTO.getPassword()));
+        }
 
         userRepository.save(oldUser);
         return oldUser;
@@ -59,15 +63,11 @@ public class UserService {
     /**
      * Deletes user from database.
      * @param userId userId of user deleted.
-     * @param password password of user deleted.
      * @return deleted user.
      * @throws InvalidPasswordException
      */
-    public User deleteUser(UUID userId, String password) throws RuntimeException {
+    public User deleteUser(UUID userId) throws MissingUserIdException {
         User user = userRepository.findById(userId).orElseThrow(() -> new MissingUserIdException("UserId Not Found."));
-        if (!user.checkUserPassword(password)) {
-            throw new InvalidPasswordException("Invalid Password");
-        }
         userRepository.delete(user);
         return user;
     }

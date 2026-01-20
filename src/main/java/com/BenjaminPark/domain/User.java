@@ -28,17 +28,17 @@ public class User {
     private String username;
 
     @Column(nullable = false)
-    private String userPassword;
+    private String passwordHash;
 
     @OneToMany(mappedBy = "owner", cascade = CascadeType.ALL)
     List<Task> tasks;
 
     protected User() {}
 
-    public User(String username, String password) {
+    public User(String username, String passwordHash) {
         this.userId = UUID.randomUUID();
         this.username = username;
-        this.userPassword = BCrypt.hashpw(password, BCrypt.gensalt());
+        this.passwordHash = passwordHash;
         this.tasks = new ArrayList<>();
     }
 
@@ -65,21 +65,8 @@ public class User {
         return userId;
     }
 
-    /**
-     * Checks if password passed matches this user's password.
-     * @param password password of this user.
-     */
-    public boolean checkUserPassword(String password) {
-        return BCrypt.checkpw(password, userPassword);
-    }
 
-    /**
-     * Returns password of this user.
-     * Intended for internal use only.
-     */
-    private String getUserPassword() {
-        return userPassword;
-    }
+
 
 
     /**
@@ -87,7 +74,11 @@ public class User {
      * @return Hashed password of this user.
      */
     public String getUserPasswordHashed() {
-        return userPassword;
+        return passwordHash;
+    }
+
+    public void replacePasswordHash(String passwordHash) {
+        this.passwordHash = passwordHash;
     }
 
     /**
@@ -95,13 +86,13 @@ public class User {
      * @param oldPassword old password of this user.
      * @param newPassword new password of this user.
      * @throws Exception Exception when old password is invalid.
-     */
+
     public void changeUserPassword(String oldPassword, String newPassword) throws InvalidPasswordException {
         if (!checkUserPassword(oldPassword)) {
             throw new InvalidPasswordException("Invalid Password");
         }
         this.userPassword = BCrypt.hashpw(newPassword, BCrypt.gensalt());
-    }
+    }*/
 
     /**
      * Returns an unmodifiable list of tasks of this user.

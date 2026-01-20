@@ -5,9 +5,11 @@ import com.BenjaminPark.dto.CreateUserDTO;
 import com.BenjaminPark.dto.UpdateUserDTO;
 import com.BenjaminPark.dto.UserResponse;
 import com.BenjaminPark.mapper.UserMapper;
+import com.BenjaminPark.security.CustomUserDetails;
 import com.BenjaminPark.service.UserService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.UUID;
@@ -44,8 +46,8 @@ public class UserController {
 
     @PostMapping
     public ResponseEntity<UserResponse> addUser(@RequestBody CreateUserDTO createUserDTO) {
-        User user = userMapper.fromCreateUserDTO(createUserDTO);
-        UserResponse userResponse = userMapper.toUserResponse(userService.createUser(user));
+        User user = userService.createUser(createUserDTO);
+        UserResponse userResponse = userMapper.toUserResponse(user);
         return ResponseEntity.status(HttpStatus.CREATED).body(userResponse);
     }
 
@@ -70,14 +72,14 @@ public class UserController {
      * <p>Applies the provided update data to the user identified by the given ID
      * and returns the updated user representation.</p>
      *
+     * @param customUserDetails The custom user details of the user to be updated
      * @param updateUserDTO DTO containing fields to update
-     * @param userId the UUID of the user to update
      * @return a {@link ResponseEntity} containing the updated user and HTTP 200 (OK)
      */
 
-    @PatchMapping("/{userId}")
-    public ResponseEntity<UserResponse> updateUser(@RequestBody UpdateUserDTO updateUserDTO, @PathVariable String userId) {
-        User user = userMapper.applyUpdate(userService.getUserById(UUID.fromString(userId)), updateUserDTO);
+    @PatchMapping("/me")
+    public ResponseEntity<UserResponse> updateUser(@AuthenticationPrincipal CustomUserDetails customUserDetails, @RequestBody UpdateUserDTO updateUserDTO) {
+        User user = userService.updateUser(customUserDetails.getUserId(), updateUserDTO);
         UserResponse userResponse = userMapper.toUserResponse(user);
         return ResponseEntity.status(HttpStatus.OK).body(userResponse);
     }
@@ -88,14 +90,13 @@ public class UserController {
      * <p>Deletes the user identified by the given ID after verifying credentials
      * and returns a representation of the deleted user.</p>
      *
-     * @param userId the UUID of the user to delete
-     * @param password the user's password for verification
+     * @param customUserDetails The custom user details of the user to be deleted
      * @return a {@link ResponseEntity} containing the deleted user and HTTP 200 (OK)
      */
 
-    @DeleteMapping("/{userId}")
-    public ResponseEntity<UserResponse> deleteUser(@PathVariable String userId, @RequestBody String password) {
-        User user = userService.deleteUser(UUID.fromString(userId), password);
+    @DeleteMapping("/me")
+    public ResponseEntity<UserResponse> deleteUser(@AuthenticationPrincipal CustomUserDetails customUserDetails) {
+        User user = userService.deleteUser(customUserDetails.getUserId());
         UserResponse userResponse = userMapper.toUserResponse(user);
         return ResponseEntity.status(HttpStatus.OK).body(userResponse);
     }
