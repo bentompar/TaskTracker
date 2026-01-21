@@ -13,7 +13,7 @@ public class CustomUserDetails implements UserDetails {
 
     private final User user;
 
-    CustomUserDetails(User user) {
+    public CustomUserDetails(User user) {
         this.user = user;
     }
 
@@ -21,18 +21,19 @@ public class CustomUserDetails implements UserDetails {
         return user.getUserId();
     }
 
-
+    @Override
     public String getUsername() {
         return user.getUsername();
     }
 
+    @Override
     public String getPassword() {
         return user.getUserPasswordHashed();
     }
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return List.of(new SimpleGrantedAuthority("ROLE_USER"));
+        return List.of(new SimpleGrantedAuthority("ROLE_" + user.getRole()));
     }
 
     @Override

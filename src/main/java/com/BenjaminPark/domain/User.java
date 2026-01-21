@@ -30,6 +30,10 @@ public class User {
     @Column(nullable = false)
     private String passwordHash;
 
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private UserRole role;
+
     @OneToMany(mappedBy = "owner", cascade = CascadeType.ALL)
     List<Task> tasks;
 
@@ -40,6 +44,7 @@ public class User {
         this.username = username;
         this.passwordHash = passwordHash;
         this.tasks = new ArrayList<>();
+        this.role = UserRole.USER;
     }
 
     /**
@@ -66,6 +71,9 @@ public class User {
     }
 
 
+    public UserRole getRole() {
+        return role;
+    }
 
 
 

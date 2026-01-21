@@ -83,7 +83,7 @@ public class TaskService {
         }
     }
 
-    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    @PreAuthorize("hasRole('ADMIN')")
     public List<Task> findAllTasks() {
         return taskRepository.findAll();
     }
